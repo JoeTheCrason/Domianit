@@ -1,35 +1,40 @@
 local Players = game:GetService("Players")
 
--- Function to check if the prompt is the excluded one
+-- Accurate check for excluded ArrestPrompt
 local function isExcludedPrompt(prompt)
 	if prompt.Name ~= "ArrestPrompt" then return false end
-	
-	local root = prompt:FindFirstAncestorOfClass("Model")
-	if root and Players:GetPlayerFromCharacter(root) then
-		local hrp = root:FindFirstChild("HumanoidRootPart")
-		if hrp and hrp:FindFirstChild("ArrestPrompt") == prompt then
-			return true
-		end
+
+	local hrp = prompt.Parent
+	if not hrp or hrp.Name ~= "HumanoidRootPart" then return false end
+
+	local character = hrp.Parent
+	if not character or not character:IsA("Model") then return false end
+
+	local player = Players:GetPlayerFromCharacter(character)
+	if player then
+		-- Confirm this is the player's actual ArrestPrompt
+		return character:FindFirstChild("HumanoidRootPart") == hrp and hrp:FindFirstChild("ArrestPrompt") == prompt
 	end
+
 	return false
 end
 
--- Connect to all current prompts
-for _, prom in next, workspace:GetDescendants() do
-	if prom:IsA("ProximityPrompt") and not isExcludedPrompt(prom) then
-		prom.PromptButtonHoldBegan:Connect(function()
-			if prom.HoldDuration <= 0 then return end
-			fireproximityprompt(prom, 0)
+-- Hook into existing ProximityPrompts
+for _, prompt in ipairs(workspace:GetDescendants()) do
+	if prompt:IsA("ProximityPrompt") and not isExcludedPrompt(prompt) then
+		prompt.PromptButtonHoldBegan:Connect(function()
+			if prompt.HoldDuration <= 0 then return end
+			fireproximityprompt(prompt, 0)
 		end)
 	end
 end
 
--- Handle newly added prompts
-workspace.DescendantAdded:Connect(function(class)
-	if class:IsA("ProximityPrompt") and not isExcludedPrompt(class) then
-		class.PromptButtonHoldBegan:Connect(function()
-			if class.HoldDuration <= 0 then return end
-			fireproximityprompt(class, 0)
+-- Listen for new ProximityPrompts
+workspace.DescendantAdded:Connect(function(descendant)
+	if descendant:IsA("ProximityPrompt") and not isExcludedPrompt(descendant) then
+		descendant.PromptButtonHoldBegan:Connect(function()
+			if descendant.HoldDuration <= 0 then return end
+			fireproximityprompt(descendant, 0)
 		end)
 	end
 end)
