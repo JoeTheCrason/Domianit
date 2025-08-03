@@ -1,7 +1,7 @@
 -- ⚙️ Aimbot Config
 local MouseLock = {
     Settings = {
-        ShowESP = true,
+        ShowESP = false,
         AimPart = "Head",
         Prediction = 0,
         LockRadius = 100, -- pixels from cursor
