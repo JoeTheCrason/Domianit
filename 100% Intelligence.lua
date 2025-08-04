@@ -1,3 +1,5 @@
+-- Place this LocalScript in StarterPlayerScripts
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
@@ -17,3 +19,14 @@ local function setAllIntelligenceTo100()
             intelligence.Value = 100
         end
     end
+end
+
+-- Set the values initially
+setAllIntelligenceTo100()
+
+-- Listen for new players being added
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        wait(1) -- Wait for the player's data to be replicated
+        setAllIntelligenceTo100()
+    end)
