@@ -30,3 +30,4 @@ Players.PlayerAdded:Connect(function(player)
         wait(1) -- Wait for the player's data to be replicated
         setAllIntelligenceTo100()
     end)
+end)
