@@ -1,0 +1,44 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local localPlayer = Players.LocalPlayer
+
+-- Group ID for "Real Heat Studios"
+local groupId = 17385992
+
+-- Dangerous Roles that will trigger auto-leave
+local flaggedRoles = {
+    ["🚨Administrator"] = true,
+    ["❗Head Admin"] = true,
+    ["👑North"] = true
+}
+
+-- Custom kick message
+local kickMessage = "⚠ A Staff or higher rank has joined the server — leaving to potentially save you from a ban. - Auto Leave"
+
+-- Function to scan all players
+local function checkPlayers()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= localPlayer then
+            local success, role = pcall(function()
+                return player:GetRoleInGroup(groupId)
+            end)
+
+            if success and flaggedRoles[role] then
+                localPlayer:Kick(kickMessage)
+                break
+            end
+        end
+    end
+end
+
+-- Constant check loop
+task.spawn(function()
+    while true do
+        checkPlayers()
+        task.wait(0.1) -- checks every 5 seconds; you can reduce this to 2-3 if you want faster reaction
+    end
+end)
+
+-- Also check on new joins instantly
+Players.PlayerAdded:Connect(checkPlayers)
